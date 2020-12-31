@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { Button, Dialog,MessageBox} from 'element-ui'
+import { Button, Dialog,MessageBox, Cascader} from 'element-ui'
 import {Form, FormItem, Input, Row, Col, Menu, Submenu, MenuItemGroup, MenuItem,Tooltip, Pagination} from'element-ui'
 import {Card, Image, Divider, Link, Collapse, Transfer, CollapseItem, Message, Container, Header, Aside, Main, Breadcrumb,BreadcrumbItem, Table, TableColumn, Switch} from 'element-ui'
 import 'element-ui/lib/theme-chalk/base.css';
@@ -8,6 +8,7 @@ Vue.prototype.$confirm = MessageBox.confirm
 
 Vue.component(CollapseTransition.name, CollapseTransition)
 Vue.use(Pagination)
+Vue.use(Cascader)
 Vue.use(Dialog)
 Vue.use(Tooltip)
 Vue.use(Switch)

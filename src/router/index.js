@@ -4,6 +4,8 @@ import Login from '../components/Login'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
 import Users from '../components/user/Users'
+import Cate from '../components/goods/Cate'
+
 
 Vue.use(VueRouter)
 
@@ -32,6 +34,10 @@ const routes = [
       {
         path: '/shops',
         component: Users
+      },
+      {
+        path: '/categories',
+        component: Cate,
       }
     ]
   }

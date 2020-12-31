@@ -77,23 +77,23 @@ export default {
             }
           ]
         },
-        {
-          authName: '权限管理',
-          id: '103',
-          children: [
-            {
-              authName: '角色列表',
-              id: '201',
-              path: '/roles'
-
-            },
-            {
-              authName: '权限列表',
-              id: '202',
-              path: '/rights'
-            }
-          ]
-        },
+        // {
+        //   authName: '权限管理',
+        //   id: '103',
+        //   children: [
+        //     {
+        //       authName: '角色列表',
+        //       id: '201',
+        //       path: '/roles'
+        //
+        //     },
+        //     {
+        //       authName: '权限列表',
+        //       id: '202',
+        //       path: '/rights'
+        //     }
+        //   ]
+        // },
         {
           authName: '商品管理',
           id: '101',
@@ -111,7 +111,7 @@ export default {
             {
               authName: '商品分类',
               id: '205',
-              path: '/goodsClass'
+              path: '/categories'
             }
           ]
         },
