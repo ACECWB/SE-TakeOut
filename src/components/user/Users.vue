@@ -22,7 +22,7 @@
 
 <!--   用户列表   -->
       <el-table :data="userlist" border stripe>
-        <el-table-column label="#" type="index"></el-table-column>
+        <el-table-column label="#" type="index" ></el-table-column>
         <el-table-column label="账户ID" prop="userid"></el-table-column>
         <el-table-column label="用户地址" prop="address"></el-table-column>
         <el-table-column label="状态">
@@ -38,7 +38,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="修改用户信息" placement="top" :enterable="false">
-              <el-button type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.id)"></el-button>
+              <el-button type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.userid)"></el-button>
             </el-tooltip>
 
             <el-tooltip effect="dark" content="删除用户" placement="top" :enterable="false">
@@ -210,7 +210,7 @@ export default {
         // if(!valid) return
         // //添加请求
         // const {data: res} = await this.$http.post('users', this.addForm);
-        // if(res.meta.status !== 201){
+        // if(res.meta.status !== 200){
         //   this.$message.error('添加用户失败！');
         // }
         // this.$message.success('成功添加用户！');

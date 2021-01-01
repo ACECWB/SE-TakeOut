@@ -9,8 +9,8 @@ import TreeTable from 'vue-table-with-tree-grid'
 
 Vue.component('tree-table', TreeTable)
 // axios.defaults.baseURL = 'http://27f8645n62.zicp.vip/rest-api/v1/'
-axios.defaults.baseURL = 'http://121.4.77.69:3170/rest-api/v1/'
-
+// axios.defaults.baseURL = 'http://121.4.77.69:3170/rest-api/v1/'
+axios.defaults.baseURL = 'www.gkjerry.xyz:3170'
 axios.interceptors.request.use(config => {
   console.log(config);
   config.headers.Authorization = window.sessionStorage.getItem('token');

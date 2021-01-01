@@ -103,16 +103,16 @@ export default {
               id: '203',
               path: '/goods'
             },
-            {
-              authName: '分类参数',
-              id: '204',
-              path: '/categories'
-            },
-            {
-              authName: '商品分类',
-              id: '205',
-              path: '/categories'
-            }
+            // {
+            //   authName: '分类参数',
+            //   id: '204',
+            //   path: '/categories'
+            // },
+            // {
+            //   authName: '商品分类',
+            //   id: '205',
+            //   path: '/categories'
+            // }
           ]
         },
         {
