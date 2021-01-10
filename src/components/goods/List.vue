@@ -10,9 +10,9 @@
     <el-card>
       <el-row :gutter="20">
         <el-col :span="6">
-          <el-input placeholder="请输入商家名称" v-model="queryInfo.queryShopers" clearable @clear="getGoodsList">
+          <el-input placeholder="请输入商家名称" v-model="queryGoodsInfo.queryShopers" clearable @clear="getGoodsList">
           </el-input>
-          <el-input placeholder="请输入商品名称" v-model="queryInfo.queryGoods" clearable @clear="getGoodsList">
+          <el-input placeholder="请输入商品名称" v-model="queryGoodsInfo.queryGoods" clearable @clear="getGoodsList">
 
             <el-button slot="append" icon="el-icon-search" @click="getGoodsList"></el-button>
           </el-input>
@@ -46,9 +46,9 @@
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="queryInfo.pagenum"
+          :current-page="queryGoodsInfo.pagenum"
           :page-sizes="[5, 10, 15, 20]"
-          :page-size="queryInfo.pagesize"
+          :page-size="queryGoodsInfo.pagesize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
           background

@@ -6,13 +6,15 @@ import './assets/css/global.css'
 import axios from 'axios'
 import swal from 'sweetalert'
 import TreeTable from 'vue-table-with-tree-grid'
+import store from './store'
 
 Vue.component('tree-table', TreeTable)
 // axios.defaults.baseURL = 'http://27f8645n62.zicp.vip/rest-api/v1/'
 // axios.defaults.baseURL = 'http://121.4.77.69:3170/rest-api/v1/'
-axios.defaults.baseURL = 'www.gkjerry.xyz:3170'
+// axios.defaults.baseURL = 'www.gkjerry.xyz:3170'
+axios.defaults.baseURL = 'https://www.gkjerry.xyz:3171/rest-api/v1/'
 axios.interceptors.request.use(config => {
-  console.log(config);
+  // console.log(config);
   config.headers.Authorization = window.sessionStorage.getItem('token');
   return config;
 })
@@ -22,5 +24,6 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

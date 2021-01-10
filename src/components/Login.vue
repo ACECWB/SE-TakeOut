@@ -6,8 +6,8 @@
   <transition name="bounce">
     <div v-show="showLogin">
     <el-card class="box-card" shadow="hover">
-    <div class="imgBox1">
-      <img src="@/assets/cloe.png" alt="" width="100%">
+    <div class="imgBox1" style="display: inline-block; vertical-align: middle">
+      <center><img src="@/assets/干.jpg" alt="" width="90%" ></center>
     </div>
 
     <div class="page-title-login">
@@ -15,7 +15,15 @@
     </div>
     <el-divider><i class="el-icon-postcard"></i></el-divider>
     <div class="form-box">
-      <el-form :model="loginForm" status-icon :rules="rules" ref="loginFormRef" class="demo-ruleForm">
+        <el-switch
+            class="switchState"
+            v-model="isAdmin"
+            active-text="Admin?"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+        </el-switch>
+
+      <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginFormRef" class="demo-ruleForm">
         <el-form-item prop="shopid">
           <el-input
               v-model="loginForm.shopid"
@@ -54,7 +62,9 @@
       <div v-show="showReister">
         <el-card class="box-card-register" shadow="hover">
           <div class="imgBox2">
-            <img src="@/assets/cat.jpg" alt="" width="100%">
+<!--            <img src="@/assets/cat.jpg" alt="" width="100%">-->
+            <center><img src="@/assets/干.jpg" alt="" width="80%" height="80%" ></center>
+
           </div>
 
           <div class="page-title-register">
@@ -137,6 +147,7 @@
 export default {
 name: "Login",
   data(){
+
     let validatePassword = (rule, value, callback) => {
       if (value != this.registerForm.password){
         callback(new Error("两次密码不一致！"))
@@ -145,6 +156,7 @@ name: "Login",
       }
     };
     return{
+      isAdmin: false,
       imagePath: '../assets/cloe.png',
       // 登陆表单数据绑定对象
       loginForm: {
@@ -158,6 +170,11 @@ name: "Login",
         address: '',
         confirmpassword: '',
         shopname: ''
+      },
+      loginRules: {
+        shopid: [{required: true, message: 'Please enter your userId!', trigger: 'blur'}],
+        password: [{required: true, message: 'Please enter your password!', trigger: 'blur'}],
+
       },
       rules: {
         shopid: [{required: true, message: 'Please enter your userId!', trigger: 'blur'},
@@ -173,7 +190,7 @@ name: "Login",
       },
       showLogin: true,
       showReister: false,
-      nowLogin: false
+      nowLogin: false,
 
     }
   },
@@ -197,8 +214,8 @@ name: "Login",
       }, 800);
 
     },
-    login() {
-      this.$refs.loginFormRef.validate(valid => {
+    async login() {
+      this.$refs.loginFormRef.validate(async valid => {
         // console.log("here", valid);
         if (!valid){
           swal({
@@ -209,59 +226,123 @@ name: "Login",
 
           })
           return false;
-        }else{
-          this.$http.put('login/?usertype=shop', this.loginForm).then(res => {
-            console.log(res);
-            if (res.data.message != '账号或密码错误'){
-              swal({
-                title: '登陆成功',
-                icon: 'success',
-              })
-              console.log(res.data.message._id)
-              window.sessionStorage.setItem('token', res.data.message._id);
-              this.$router.push('/home')
-
-            }else{
-              swal({
-                title: '登陆失败, 账号或密码错误!',
-                icon: 'error'
-              })
-              return false;
-            }
-          })
-
         }
       })
+      // 登陆成功判断是管理员还是商家
+      let url = ''
+      let loginForm
+      console.log('isAdmin')
+      console.log(this.isAdmin);
+      if (this.isAdmin){
+        url = 'login/?usertype=administrator'
+        loginForm = {
+          administratorid: this.loginForm.shopid,
+          password: this.loginForm.password
+        }
+      }else{
+        url = 'login/?usertype=shop'
+        loginForm = this.loginForm
+      }
+
+      const {data: res} = await this.$http.put(url, loginForm)
+      console.log('login:');
+      console.log(res);
+      console.log(url);
+      console.log(loginForm);
+      if (res.meta.status == true){
+        swal({
+          title: '登陆成功',
+          icon: 'success',
+        })
+        console.log('LoginSuccess');
+        console.log(res.data);
+        console.log(res.data.address)
+        if (res.data.shopid == null){
+          window.sessionStorage.setItem('token', 'Admin');
+          this.$store.state.isAdmin = true
+        }
+        else{
+          window.sessionStorage.setItem('token', res.data.shopid);
+          this.$store.state.shopName = res.data.shopname
+          this.$store.state.shopId = res.data.shopid
+        }
+
+        // console.log(this.loginForm);
+        this.$router.push({
+          path:'/home',
+        })
+
+      }else{
+        swal({
+          title: '登陆失败, 账号或密码错误!',
+          icon: 'error'
+        })
+        return false;
+      }
     },
     register() {
-      this.$refs.registerFormRef.validate(valid => {
+      let _this = this
+      this.$refs.registerFormRef.validate(async valid => {
         if (!valid) {
           swal({
             type: 'error',
-            title: '注册失败',
+            title: '注册失败，请认真填写注册表信息！',
             icon: 'error',
           })
-          return false;
+          return;
         }else{
-          this.$http.put('register/?usertype=shop', this.registerForm).then(res => {
-            console.log(res);
-            let _this = this;
+          let {data: res} = await this.$http.put('register/?usertype=shop', this.registerForm)
+
+          console.log(res);
+          if (res.meta.status != true) {
             swal({
-              type: 'success',
-              title: '注册成功',
-              icon: 'success',
-              confirmButtonText: '确定',
-              closeOnConfirm: false,
-            }).then(function () {
-              console.log(_this, res.data._id)
-              window.sessionStorage.setItem('token', res.data._id);
-              _this.$router.push('/home')
-            });
+              type: 'error',
+              title: '注册失败, 此商家ID已存在！',
+              icon: 'error',
+            })
+            return
+          }
+
+          swal({
+            type: 'success',
+            title: '注册成功',
+            icon: 'success',
+            confirmButtonText: '确定',
+            closeOnConfirm: false,
+          }).then(function () {
+            console.log(_this, res.data._id)
+            window.sessionStorage.setItem('token', res.data._id);
+            _this.$router.push('/home')
+          });
+
+          // this.$http.put('register/?usertype=shop', this.registerForm).then(res => {
+          //   console.log(res);
+          //   let _this = this;
+          //   if(res.data.meta == true){
+          //     swal({
+          //       type: 'success',
+          //       title: '注册成功',
+          //       icon: 'success',
+          //       confirmButtonText: '确定',
+          //       closeOnConfirm: false,
+          //     }).then(function () {
+          //       console.log(_this, res.data._id)
+          //       window.sessionStorage.setItem('token', res.data._id);
+          //       _this.$router.push('/home')
+          //     });
+          //   }else{
+          //     swal({
+          //       type: 'error',
+          //       title: '注册失败, 此商家ID已存在！',
+          //       icon: 'error',
+          //     })
+          //   }
 
 
-          })
 
-        }
+          }
+
+
 
       })
     }
@@ -286,7 +367,7 @@ name: "Login",
   left: 50%;
   transform: translate(-50%, -50%);
   width: 400px;
-  height:540px;
+  height:560px;
   border-radius: 5%;
 }
 .imgBox1 {
@@ -294,7 +375,10 @@ name: "Login",
   margin-top: 40px;
   margin-bottom: 10px;
   left: 50%;
+  /*right: 50%;*/
   transform: translate(-50%, -20%);
+  /*justify-content: center;*/
+
 }
 
 .imgBox2 {
@@ -362,6 +446,9 @@ name: "Login",
   top: 50%;
   left: 50%;
   animation: bounce-in .5s reverse;
+}
+.switchState {
+  margin-top: -20px;
 }
 @keyframes bounce-in {
   0% {

@@ -181,7 +181,7 @@ export default {
     // 获取商品分类数据列表
     async getCateList () {
       const { data: res } = await this.$http.get('categories')
-      if (res.meta.status !== 200) {
+      if (res.meta.status !== true) {
         return this.$message.error('获取商品列表失败！')
       }
       this.cateList = res.data

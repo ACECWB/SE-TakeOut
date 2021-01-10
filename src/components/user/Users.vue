@@ -21,7 +21,7 @@
       </el-row>
 
 <!--   用户列表   -->
-      <el-table :data="userlist" border stripe>
+      <el-table :data="userlist" border stripe @row-click="showDrawer">
         <el-table-column label="#" type="index" ></el-table-column>
         <el-table-column label="账户ID" prop="userid"></el-table-column>
         <el-table-column label="用户地址" prop="address"></el-table-column>
@@ -93,17 +93,18 @@
         :visible.sync="editDialogVisible"
         width="50%"
         @close="editDialogClosed">
-      <el-form ref="editFormRef" :model="editForm" rules="editFormRules" label-width="70px">
+      <el-form ref="editFormRef" :model="editForm"
+               :rules="editFormRules" label-width="70px">
         <el-form-item label="用户名">
           <el-input v-model="editForm.userid" disabled></el-input>
         </el-form-item>
 
         <el-form-item label="地址" prop="address">
-          <el-input v-model="editForm.address" disabled></el-input>
+          <el-input v-model="editForm.address"></el-input>
         </el-form-item>
 
         <el-form-item label="密码" prop="password">
-          <el-input v-model="editForm.password" disabled></el-input>
+          <el-input v-model="editForm.password"></el-input>
         </el-form-item>
 
       </el-form>
@@ -136,19 +137,19 @@ export default {
         pagesize: 2
       },
       userlist: [
-        {
-          userid: '456',
-          address: 'zucc',
-          state: true
-
-        },
-        {
-          userid: '789',
-          address: 'zju',
-          state: false
-        }
+        // {
+        //   userid: '456',
+        //   address: 'zucc',
+        //   state: true
+        //
+        // },
+        // {
+        //   userid: '789',
+        //   address: 'zju',
+        //   state: false
+        // }
       ],
-      total: 2,
+      total: 0,
       // 添加用户的表单
       addForm: {
         userid: '',
@@ -166,6 +167,7 @@ export default {
                     { min: 6, max: 20, message: '密码长度在6-20之间', trigger: "blur"}],
 
       },
+
     }
   },
   created() {
@@ -173,25 +175,36 @@ export default {
   },
   methods: {
     async getUserList() {
-      // const { data: res } = await this.$http.get('users', {
-      //   params: this.queryInfo
-      // })
-      // console.log(res);
-      // if (res.meta.status !== 200){
-      //   return this.$message.error('获取用户列表失败!')
-      // }
-      // this.userlist = res.data.users;
-      // this.total = res.data.total;
+      const { data: res } = await this.$http.get('users', {
+        params: this.queryInfo
+      })
+      console.log(res);
+      if (res.meta.status !== true){
+        return this.$message.error('获取用户列表失败!')
+      }
+      this.userlist = res.data.users;
+      this.total = res.data.total;
 
+    },
+    showDrawer(row) {
+      console.log(row)
+      this.drawerTitle = row.shopid + ' ' + row.shopname
+      this.drawer = true
+      this.nowShopId = row.shopid
+      this.getGoodsList(row.shopid)
     },
     // 监听 pagesize的改变
     handleSizeChange(newSize) {
       this.queryInfo.pagesize = newSize;
+      console.log('handleSizeChange');
+      console.log(newSize);
       this.getUserList();
     },
     // 监听页码改变
     handleCurrentChange(newPage) {
       this.queryInfo.pagenum = newPage;
+      console.log('handleCurrentChange(newPage)');
+      console.log(newPage);
       this.getUserList();
     },
     async stateChanged(userinfo) {  //监听state switch
@@ -207,63 +220,68 @@ export default {
     },
     addUser() { //点击确定后添加用户
       this.$refs.addFormRef.validate(async valid => {
-        // if(!valid) return
-        // //添加请求
-        // const {data: res} = await this.$http.post('users', this.addForm);
-        // if(res.meta.status !== 200){
-        //   this.$message.error('添加用户失败！');
-        // }
-        // this.$message.success('成功添加用户！');
-        // this.dialogVisible = false;
-        // this.getUserList();
+        if(!valid) {
+          return this.$message.error('请认真填写表单！')
+        }
+        //添加请求
+        const {data: res} = await this.$http.put('register?usertype=customer', this.addForm);
+        console.log(res);
+        if(res.meta.status !== true){
+          return this.$message.error('添加用户失败！有重复的用户ID!');
+        }
+        this.$message.success('成功添加用户！');
+        this.dialogVisible = false;
+        this.getUserList();
 
       })
     },
     async showEditDialog(id) {
-      // this.editDialogVisible = true;
-      // const {data: res} = await this.$http.get('users/' + id)
-      //
-      // if (res.meta.status !== 200){
-      //   return this.$message.error('查询用户信息失败！');
-      // }
-      // this.$message.success('成功查询用户信息！');
-      // this.editForm = res.data;
-      // this.editDialogVisible = true;
+      this.editDialogVisible = true;
+      const {data: res} = await this.$http.get('users/' + id)
+
+      if (res.meta.status !== true){
+        return this.$message.error('查询用户信息失败！');
+      }
+      this.$message.success('成功查询用户信息！');
+      this.editForm = res.data;
+      this.editDialogVisible = true;
     },
     editDialogClosed() { //监听修改用户对话框的关闭事件
       this.$refs.editFormRef.resetFields();
     },
     editUserInfo() { //修改用户信息并提交
-      // this.$refs.editFormRef.validate(async valid => {
-      //   if (!valid) return;
-      //   const {data: res} = await this.$http.put('users/' + this.editForm.userid, {
-      //     address: this.editForm.address,
-      //     password: this.editForm.password
-      //   })
-      //   if (res.meta.status != 200){
-      //     return this.$message.error('更新用户信息失败！');
-      //   }
-      //   this.editDialogVisible = false;  //关闭对话框
-      //   this.getUserList(); //刷新列表
-      //   this.$message.success("成功更新用户信息！");
-      // })
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return;
+        const {data: res} = await this.$http.put('users/' + this.editForm.userid, {
+          address: this.editForm.address,
+          password: this.editForm.password
+        })
+        if (res.meta.status != true){
+          return this.$message.error('更新用户信息失败！');
+        }
+        this.editDialogVisible = false;  //关闭对话框
+        this.getUserList(); //刷新列表
+        this.$message.success("成功更新用户信息！");
+      })
     },
     async removeUserById(userid) {
-      // const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // }).catch(error => error)
-      // //取消删除返回cancel，确认返回confirm
-      // if (confirmResult !== 'confirm') { //取消
-      //   return this.$message.info('已取消删除');
-      // }
-      // const {data: res} = this.$http.delete('users/' + userid);
-      // if (res.meta.status !== 200){
-      //   return this.$message.error('删除用户失败！');
-      // }
-      // this.$message.success('成功删除用户！');
-      // this.getUserList();
+      console.log(userid);
+      const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(error => error)
+      //取消删除返回cancel，确认返回confirm
+      if (confirmResult !== 'confirm') { //取消
+        return this.$message.info('已取消删除');
+      }
+      const {data: res} = await this.$http.delete('users/' + userid);
+      console.log(res);
+      if (res.meta.status !== true){
+        return this.$message.error('删除用户失败！');
+      }
+      this.$message.success('成功删除用户！');
+      this.getUserList();
     }
 
   },
